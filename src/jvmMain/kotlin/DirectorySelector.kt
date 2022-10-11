@@ -32,9 +32,9 @@ import ru.dmitriyt.vkarchiver.data.model.LoadingState
 import java.io.File
 
 @Composable
-fun DirectorySelectorButton(text: String, oldDirectory: File?, modifier: Modifier = Modifier, onSelect: (File) -> Unit) {
+fun DirectorySelectorButton(text: String, oldDirectoryPath: String?, modifier: Modifier = Modifier, onSelect: (String) -> Unit) {
     val showDialog = remember { mutableStateOf(false) }
-    DirectorySelectorDialog(showDialog.value, oldDirectory, onSelect) {
+    DirectorySelectorDialog(showDialog.value, oldDirectoryPath, onSelect) {
         showDialog.value = false
     }
     Button(onClick = {
@@ -45,12 +45,17 @@ fun DirectorySelectorButton(text: String, oldDirectory: File?, modifier: Modifie
 }
 
 @Composable
-private fun DirectorySelectorDialog(showDialog: Boolean, oldDirectory: File?, onSelect: (File) -> Unit, closeDialog: () -> Unit) {
+private fun DirectorySelectorDialog(
+    showDialog: Boolean,
+    oldDirectoryPath: String?,
+    onSelect: (String) -> Unit,
+    closeDialog: () -> Unit
+) {
     if (showDialog) {
         Dialog(title = "Выбор директории", onCloseRequest = {
             closeDialog()
         }) {
-            DirectoryListDialogContent(oldDirectory) { selectedDirectory ->
+            DirectoryListDialogContent(oldDirectoryPath) { selectedDirectory ->
                 onSelect(selectedDirectory)
                 closeDialog()
             }
@@ -59,8 +64,8 @@ private fun DirectorySelectorDialog(showDialog: Boolean, oldDirectory: File?, on
 }
 
 @Composable
-private fun DirectoryListDialogContent(oldDirectory: File?, onSelect: (File) -> Unit) {
-    val currentDir = remember { mutableStateOf(oldDirectory) }
+private fun DirectoryListDialogContent(oldDirectoryPath: String?, onSelect: (String) -> Unit) {
+    val currentDir = remember { mutableStateOf(oldDirectoryPath?.let { File(it) }) }
     Column {
         if (currentDir.value != null) {
             TopAppBar(
@@ -82,7 +87,7 @@ private fun DirectoryListDialogContent(oldDirectory: File?, onSelect: (File) -> 
         FileListState(currentDir.value, { newDirectory ->
             currentDir.value = newDirectory
         }, { selectedDirectory ->
-            onSelect(selectedDirectory)
+            onSelect(selectedDirectory.absolutePath)
         })
     }
 }

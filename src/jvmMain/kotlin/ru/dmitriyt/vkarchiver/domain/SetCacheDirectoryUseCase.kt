@@ -2,7 +2,7 @@ package ru.dmitriyt.vkarchiver.domain
 
 import ru.dmitriyt.vkarchiver.data.repository.SettingsRepository
 
-class SaveCacheDirectoryUseCase(
+class SetCacheDirectoryUseCase(
     private val settingsRepository: SettingsRepository,
 ) {
     suspend operator fun invoke(directoryPath: String) {
@@ -12,6 +12,6 @@ class SaveCacheDirectoryUseCase(
     }
 
     companion object {
-        val instance = SaveCacheDirectoryUseCase(SettingsRepository())
+        fun new() = SetCacheDirectoryUseCase(SettingsRepository())
     }
 }

@@ -35,6 +35,7 @@ import ru.dmitriyt.vkarchiver.data.model.LoadingState
 import ru.dmitriyt.vkarchiver.data.resources.StringRes
 import ru.dmitriyt.vkarchiver.domain.AuthByCodeUseCase
 import ru.dmitriyt.vkarchiver.domain.SaveWallPostsUseCase
+import ru.dmitriyt.vkarchiver.presentation.ui.VkArchieverApp
 import java.io.File
 
 private const val GET_CODE_LINK = "https://oauth.vk.com/authorize?client_id=APP_ID&redirect_uri=http://localhost"
@@ -59,8 +60,8 @@ fun App() {
                 )
                 DirectorySelectorButton(
                     text = if (directory == null) "Выбрать" else "Изменить",
-                    oldDirectory = directory,
-                    onSelect = { directory = it },
+                    oldDirectoryPath = directory?.absolutePath,
+                    onSelect = { directory = File(it) },
                 )
             }
 
@@ -147,7 +148,7 @@ fun App() {
 
 fun main() = application {
     Window(title = StringRes.appName, onCloseRequest = ::exitApplication) {
-        App()
+        VkArchieverApp()
     }
 }
 

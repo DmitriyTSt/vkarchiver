@@ -24,5 +24,9 @@ class AuthByCodeUseCase(
             settingsRepository = SettingsRepository(),
             vkApiRepository = VkApiRepository(),
         )
+        fun new() = AuthByCodeUseCase(
+            settingsRepository = SettingsRepository(),
+            vkApiRepository = VkApiRepository(),
+        )
     }
 }

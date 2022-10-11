@@ -1,6 +1,7 @@
 package ru.dmitriyt.vkarchiver.presentation.ui.auth
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -39,7 +40,7 @@ fun AuthScreen(viewModel: AuthViewModel = viewModels()) {
         if (state == AuthScreenState.Loading) {
             CircularProgressIndicator()
         } else {
-            Box(modifier = Modifier.fillMaxHeight().padding(top = 32.dp)) {
+            Column(modifier = Modifier.fillMaxHeight().padding(top = 32.dp)) {
                 AuthLink(viewModel, state.link)
                 if (state is AuthScreenState.AwaitCode || state is AuthScreenState.LoginError) {
                     TextField(authCode, onValueChange = { authCode = it }, placeholder = { Text("code") })
@@ -54,12 +55,11 @@ fun AuthScreen(viewModel: AuthViewModel = viewModels()) {
                     }
                 }
             }
-        }
-    }
-
-    if (state is AuthScreenState.LoginSuccess) {
-        LaunchedEffect(null) {
-            viewModel.openMain()
+            if (state is AuthScreenState.LoginSuccess) {
+                LaunchedEffect(null) {
+                    viewModel.openMain()
+                }
+            }
         }
     }
 }

@@ -11,6 +11,7 @@ class SplashUseCase(
             appEnvRepository.getEnv()
             true
         } catch (e: Exception) {
+            e.printStackTrace()
             false
         }
         return if (!envValid) {

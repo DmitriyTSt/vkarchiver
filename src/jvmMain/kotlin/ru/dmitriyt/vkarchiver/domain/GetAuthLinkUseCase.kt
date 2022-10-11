@@ -7,7 +7,7 @@ class GetAuthLinkUseCase(
 ) {
     suspend operator fun invoke(): String {
         val env = appEnvRepository.getEnv()
-        return "https://oauth.vk.com/authorize?client_id=${env.appId}&redirect_uri=${env.clientSecret}"
+        return "https://oauth.vk.com/authorize?client_id=${env.appId}&redirect_uri=${env.redirectUri}"
     }
 
     companion object {

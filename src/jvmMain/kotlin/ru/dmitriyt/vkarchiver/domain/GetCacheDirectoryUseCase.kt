@@ -10,6 +10,6 @@ class GetCacheDirectoryUseCase(
     }
 
     companion object {
-        val instance = GetCacheDirectoryUseCase(SettingsRepository())
+        fun new() = GetCacheDirectoryUseCase(SettingsRepository())
     }
 }
