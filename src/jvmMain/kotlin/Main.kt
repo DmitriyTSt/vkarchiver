@@ -176,7 +176,7 @@ private fun loadingAllWallPost(userActor: UserActor, groupAddress: String): Stat
         val firstPartResponse = try {
             loadWallPosts(userActor, groupAddress, 0, 50)
         } catch (e: Exception) {
-            value = LoadingState.Error(e.message)
+            value = LoadingState.Error(e)
             return@produceState
         }
 
@@ -190,7 +190,7 @@ private fun loadingAllWallPost(userActor: UserActor, groupAddress: String): Stat
             val partResponse = try {
                 loadWallPosts(userActor, groupAddress, 50 + 50 * it, 50)
             } catch (e: Exception) {
-                value = LoadingState.Error(e.message)
+                value = LoadingState.Error(e)
                 return@produceState
             }
 
@@ -205,7 +205,7 @@ private fun savePosts(groupAddress: String, posts: List<WallpostFull>, directory
     val domain = groupAddress.replace("https://vk.com/", "")
     return produceState<LoadingState<String>>(LoadingState.Loading(), groupAddress) {
         if (directory == null) {
-            value = LoadingState.Error("Директория не выбрана")
+            value = LoadingState.Error(IllegalStateException("Директория не выбрана"))
         } else {
             val fileName = SaveWallPostsUseCase.instance(directory.absolutePath, domain, posts)
 

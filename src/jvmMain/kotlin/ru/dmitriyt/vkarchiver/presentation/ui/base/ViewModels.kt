@@ -1,5 +1,6 @@
 package ru.dmitriyt.vkarchiver.presentation.ui.base
 
+import ru.dmitriyt.vkarchiver.domain.SplashUseCase
 import ru.dmitriyt.vkarchiver.presentation.ui.splash.SplashViewModel
 
 object ViewModelStorage {
@@ -21,7 +22,9 @@ object ViewModelStorage {
 
 inline fun <reified T : BaseViewModel> viewModels(): T {
     return when (T::class.java) {
-        SplashViewModel::class.java -> ViewModelStorage.getOrCreate(SplashViewModel::class.java) { SplashViewModel() } as T
+        SplashViewModel::class.java -> {
+            ViewModelStorage.getOrCreate(SplashViewModel::class.java) { SplashViewModel(SplashUseCase.new()) } as T
+        }
         else -> throw IllegalStateException("Unknown viewModel ${T::class.java}")
     }
 }
