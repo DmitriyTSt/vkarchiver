@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
@@ -40,11 +42,16 @@ fun AuthScreen(viewModel: AuthViewModel = viewModels()) {
         if (state == AuthScreenState.Loading) {
             CircularProgressIndicator()
         } else {
-            Column(modifier = Modifier.fillMaxHeight().padding(top = 32.dp)) {
+            Column(modifier = Modifier.fillMaxHeight().widthIn(300.dp, 320.dp).padding(top = 32.dp)) {
                 AuthLink(viewModel, state.link)
                 if (state is AuthScreenState.AwaitCode || state is AuthScreenState.LoginError) {
-                    TextField(authCode, onValueChange = { authCode = it }, placeholder = { Text("code") })
-                    Button(onClick = {
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = authCode,
+                        onValueChange = { authCode = it },
+                        placeholder = { Text("code") },
+                    )
+                    Button(modifier = Modifier.fillMaxWidth(), onClick = {
                         viewModel.loginByCode(authCode)
                     }) {
                         Text("Войти")
