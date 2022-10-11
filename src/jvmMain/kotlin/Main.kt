@@ -25,10 +25,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import com.google.gson.Gson
 import com.vk.api.sdk.client.actors.UserActor
-import com.vk.api.sdk.objects.wall.WallpostAttachment
-import com.vk.api.sdk.objects.wall.WallpostAttachmentType
 import com.vk.api.sdk.objects.wall.WallpostFull
 import com.vk.api.sdk.objects.wall.responses.GetResponse
 import kotlinx.coroutines.Dispatchers
@@ -37,8 +34,8 @@ import kotlinx.coroutines.withContext
 import ru.dmitriyt.vkarchiver.data.model.LoadingState
 import ru.dmitriyt.vkarchiver.data.resources.StringRes
 import ru.dmitriyt.vkarchiver.domain.AuthByCodeUseCase
+import ru.dmitriyt.vkarchiver.domain.SaveWallPostsUseCase
 import java.io.File
-import java.text.SimpleDateFormat
 
 private const val GET_CODE_LINK = "https://oauth.vk.com/authorize?client_id=APP_ID&redirect_uri=http://localhost"
 
@@ -210,86 +207,9 @@ private fun savePosts(groupAddress: String, posts: List<WallpostFull>, directory
         if (directory == null) {
             value = LoadingState.Error("Директория не выбрана")
         } else {
-            val newJsonFile = File(directory, "group___${domain}.json")
-            if (!newJsonFile.exists()) {
-                withContext(Dispatchers.IO) {
-                    newJsonFile.createNewFile()
-                }
-            }
+            val fileName = SaveWallPostsUseCase.instance(directory.absolutePath, domain, posts)
 
-            withContext(Dispatchers.IO) {
-                newJsonFile.writeText(Gson().toJson(posts))
-            }
-
-            val newHtmlFile = File(directory, "group___${domain}.html")
-            if (!newHtmlFile.exists()) {
-                withContext(Dispatchers.IO) {
-                    newHtmlFile.createNewFile()
-                }
-            }
-
-            withContext(Dispatchers.IO) {
-                newHtmlFile.writeText(getHtmlPosts(groupAddress, posts))
-            }
-
-            value = LoadingState.Success(newJsonFile.toString().removeSuffix(".json"))
+            value = LoadingState.Success(fileName)
         }
-    }
-}
-
-private suspend fun getHtmlPosts(groupAddress: String, posts: List<WallpostFull>): String = withContext(Dispatchers.Default) {
-    """
-        <html>
-            <head>
-                <style>
-                    .attachment-photo img {
-                        width: 300px;
-                    }
-                </style>
-            </head>
-            <body>
-                <h1><a href="$groupAddress">$groupAddress</a></h1>
-                
-                <div class="posts-wrap">
-                    ${posts.map { post -> getPostHtml(post) }.joinToString("\n")}
-                </div>
-            </body>
-        </html>
-    """.trimIndent()
-}
-
-private fun getPostHtml(post: WallpostFull): String {
-    val formatter = SimpleDateFormat("dd.MM.yyyy HH:mm")
-    val dateString = formatter.format((post.date ?: 0) * 1000L)
-    return """
-        <div class="post">
-            <div class="post-author">Автор: ${post.fromId ?: 0}</div>
-            <div class="post-date">$dateString</div>
-            <div class="post-text">${post.text ?: ""}</div>
-            <div class="post-attachments">
-                ${post.attachments.orEmpty().map { getAttachmentHtml(it) }.joinToString("\n")}
-            </div>
-        </div>
-        <hr/>
-    """.trimIndent()
-}
-
-private fun getAttachmentHtml(attachment: WallpostAttachment): String {
-    return when (attachment.type) {
-        WallpostAttachmentType.PHOTO -> """<div class="attachment-photo">
-                <img src="${attachment.photo.sizes.maxByOrNull { it.width }?.url}"/>
-                ${attachment.photo.images.orEmpty().map { """<a href="${it.url}">${it.url}</a>""" }.joinToString("\n")}
-            </div>""".trimIndent()
-        WallpostAttachmentType.VIDEO -> """<div class="attachment-video">
-                <img src="${attachment.video.firstFrame?.maxByOrNull { it.width }?.url}"/>
-                ${attachment.video.ownerId}_${attachment.video.id}
-                ${attachment.video.trackCode}
-            </div>""".trimIndent()
-        WallpostAttachmentType.DOC -> """<div class="attachment-doc"><a href="${attachment.doc.url}">${attachment.doc.url}</a></div>"""
-        WallpostAttachmentType.LINK -> """<div class="attachment-link"><a href="${attachment.link.url}">${attachment.link.url}</a></div>"""
-        WallpostAttachmentType.PHOTOS_LIST -> """<div class="attachment-photoList">
-            ${attachment.photosList.map { """<a href="$it">$it</a>""" }.joinToString("\n")}
-        """.trimIndent()
-        else -> ""
     }
 }

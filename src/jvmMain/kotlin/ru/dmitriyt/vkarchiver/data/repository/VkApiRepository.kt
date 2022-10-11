@@ -14,9 +14,9 @@ interface VkApiRepository {
     suspend fun loadWallPosts(userActor: UserActor, domain: String, offset: Int, limit: Int): GetResponse
 }
 
-fun VkApiRepository() = VkApiRepositoryImpl(AppEnvRepository())
+fun VkApiRepository(): VkApiRepository = VkApiRepositoryImpl(AppEnvRepository())
 
-class VkApiRepositoryImpl(
+private class VkApiRepositoryImpl(
     private val appEnvRepository: AppEnvRepository,
 ) : VkApiRepository {
     private val vk = VkApiClient(HttpTransportClient.getInstance())

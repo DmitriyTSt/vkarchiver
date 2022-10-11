@@ -6,4 +6,5 @@ import kotlinx.serialization.Serializable
 data class Settings(
     val userId: Int? = null,
     val accessToken: String? = null,
+    val cacheDirectoryPath: String? = null
 )

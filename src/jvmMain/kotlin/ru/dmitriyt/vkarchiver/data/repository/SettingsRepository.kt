@@ -20,9 +20,9 @@ interface SettingsRepository {
     suspend fun saveSettings(settings: Settings)
 }
 
-fun SettingsRepository() = SettingsRepositoryImpl()
+fun SettingsRepository(): SettingsRepository = SettingsRepositoryImpl()
 
-class SettingsRepositoryImpl : SettingsRepository {
+private class SettingsRepositoryImpl : SettingsRepository {
     override suspend fun getSettings(): Settings = withContext(Dispatchers.IO) {
         try {
             File(SETTINGS_FILE_NAME).readText().let { Json.decodeFromString(it) }

@@ -14,9 +14,9 @@ interface AppEnvRepository {
     suspend fun getEnv(): AppEnv
 }
 
-fun AppEnvRepository() = AppEnvRepositoryImpl()
+fun AppEnvRepository(): AppEnvRepository = AppEnvRepositoryImpl()
 
-class AppEnvRepositoryImpl : AppEnvRepository {
+private class AppEnvRepositoryImpl : AppEnvRepository {
 
     override suspend fun getEnv(): AppEnv {
         return File(APP_ENV_FILE_NAME).readText().let { Json.decodeFromString(it) }
