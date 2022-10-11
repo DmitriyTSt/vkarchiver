@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import ru.dmitriyt.vkarchiver.data.model.LoadingState
 import ru.dmitriyt.vkarchiver.domain.AuthByCodeUseCase
 import ru.dmitriyt.vkarchiver.domain.GetAuthLinkUseCase
+import ru.dmitriyt.vkarchiver.presentation.navigation.NavigationOptions
 import ru.dmitriyt.vkarchiver.presentation.navigation.Screen
 import ru.dmitriyt.vkarchiver.presentation.ui.base.BaseViewModel
 
@@ -28,7 +29,7 @@ class AuthViewModel(
     }
 
     fun openMain() {
-        navigate(Screen.Main)
+        navigate(Screen.Main, NavigationOptions(popUpTo = Screen.Auth, popUpToInclusive = true))
     }
 
     fun loginByCode(code: String) {
