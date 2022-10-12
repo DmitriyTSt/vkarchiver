@@ -15,12 +15,17 @@ class GetWallPostsUseCase(
 ) {
     suspend operator fun invoke(domain: String): Flow<Result> = flow {
         val actor = settingsRepository.getSettings().let { UserActor(it.userId, it.accessToken) }
-        val firstPartResponse = vkApiRepository.loadWallPosts(
-            userActor = actor,
-            domain = domain,
-            offset = 0,
-            limit = DEFAULT_LIMIT,
-        )
+        val firstPartResponse = try {
+            vkApiRepository.loadWallPosts(
+                userActor = actor,
+                domain = domain,
+                offset = 0,
+                limit = DEFAULT_LIMIT,
+            )
+        } catch (e: Exception) {
+            emit(Result.Error(e))
+            return@flow
+        }
 
         val total = firstPartResponse.count
         val allPosts = mutableListOf<WallpostFull>()
@@ -29,13 +34,17 @@ class GetWallPostsUseCase(
         emit(Result.Progress(allPosts.size.toFloat() / total))
 
         repeat(total / DEFAULT_LIMIT) {
-            val partResponse = vkApiRepository.loadWallPosts(
-                userActor = actor,
-                domain = domain,
-                offset = DEFAULT_LIMIT + DEFAULT_LIMIT * it,
-                limit = DEFAULT_LIMIT,
-            )
-
+            val partResponse = try {
+                vkApiRepository.loadWallPosts(
+                    userActor = actor,
+                    domain = domain,
+                    offset = DEFAULT_LIMIT + DEFAULT_LIMIT * it,
+                    limit = DEFAULT_LIMIT,
+                )
+            } catch (e: Exception) {
+                emit(Result.Error(e))
+                return@flow
+            }
             allPosts.addAll(partResponse.items)
             emit(Result.Progress(allPosts.size.toFloat() / total))
         }
@@ -46,10 +55,11 @@ class GetWallPostsUseCase(
     sealed class Result {
         data class Progress(val progress: Float) : Result()
         data class Data(val items: List<WallpostFull>) : Result()
+        data class Error(val t: Throwable) : Result()
     }
 
     companion object {
-        val instance = GetWallPostsUseCase(
+        fun new() = GetWallPostsUseCase(
             settingsRepository = SettingsRepository(),
             vkApiRepository = VkApiRepository(),
         )

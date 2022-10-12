@@ -3,10 +3,13 @@ package ru.dmitriyt.vkarchiver.presentation.ui.base
 import ru.dmitriyt.vkarchiver.domain.AuthByCodeUseCase
 import ru.dmitriyt.vkarchiver.domain.GetAuthLinkUseCase
 import ru.dmitriyt.vkarchiver.domain.GetCacheDirectoryUseCase
+import ru.dmitriyt.vkarchiver.domain.GetWallPostsUseCase
+import ru.dmitriyt.vkarchiver.domain.SaveWallPostsUseCase
 import ru.dmitriyt.vkarchiver.domain.SetCacheDirectoryUseCase
 import ru.dmitriyt.vkarchiver.domain.SplashUseCase
 import ru.dmitriyt.vkarchiver.presentation.ui.auth.AuthViewModel
 import ru.dmitriyt.vkarchiver.presentation.ui.main.MainViewModel
+import ru.dmitriyt.vkarchiver.presentation.ui.savewall.SaveWallViewModel
 import ru.dmitriyt.vkarchiver.presentation.ui.splash.SplashViewModel
 
 object ViewModelStorage {
@@ -48,6 +51,14 @@ inline fun <reified T : BaseViewModel> viewModels(): T {
                 MainViewModel(
                     getCacheDirectoryUseCase = GetCacheDirectoryUseCase.new(),
                     setCacheDirectoryUseCase = SetCacheDirectoryUseCase.new(),
+                )
+            } as T
+        }
+        SaveWallViewModel::class.java -> {
+            ViewModelStorage.getOrCreate(SaveWallViewModel::class.java) {
+                SaveWallViewModel(
+                    getWallPostsUseCase = GetWallPostsUseCase.new(),
+                    saveWallPostsUseCase = SaveWallPostsUseCase.new(),
                 )
             } as T
         }

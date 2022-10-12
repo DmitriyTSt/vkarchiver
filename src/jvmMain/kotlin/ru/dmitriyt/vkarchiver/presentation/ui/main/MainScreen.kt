@@ -4,6 +4,7 @@ import DirectorySelectorButton
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
@@ -16,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ru.dmitriyt.vkarchiver.data.resources.StringRes
 import ru.dmitriyt.vkarchiver.presentation.ui.base.viewModels
+import ru.dmitriyt.vkarchiver.presentation.ui.savewall.SaveWallView
 
 @Composable
 fun MainScreen(viewModel: MainViewModel = viewModels()) {
@@ -42,5 +44,6 @@ fun MainScreen(viewModel: MainViewModel = viewModels()) {
                 )
             }
         }
+        SaveWallView(modifier = Modifier.fillMaxWidth(), (directoryState as? DirectoryState.Data)?.directoryPath)
     }
 }
