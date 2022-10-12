@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "ru.dmitriyt"
-version = "1.0-SNAPSHOT"
+version = "1.0"
 
 repositories {
     google()
@@ -41,8 +41,9 @@ compose.desktop {
         mainClass = "MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "vkarchiver"
+            packageName = "VkArchiver"
             packageVersion = "1.0.0"
+            description = "DmitriyT's vk archiver app"
         }
     }
 }

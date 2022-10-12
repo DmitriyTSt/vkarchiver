@@ -6,7 +6,7 @@ import ru.dmitriyt.vkarchiver.presentation.navigation.Router
 import ru.dmitriyt.vkarchiver.presentation.navigation.ScreenContainer
 
 @Composable
-fun VkArchieverApp() {
+fun VkArchiverApp() {
     val navigation = Router.screen.collectAsState()
     ScreenContainer(navigationState = navigation)
 }
