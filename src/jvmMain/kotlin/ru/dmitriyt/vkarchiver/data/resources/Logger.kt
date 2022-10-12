@@ -6,6 +6,6 @@ object Logger {
     }
 
     fun e(e: Throwable) {
-        System.err.println(e.message)
+        e.printStackTrace()
     }
 }

@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import ru.dmitriyt.vkarchiver.data.repository.SettingsRepository
 import ru.dmitriyt.vkarchiver.data.repository.VkApiRepository
+import ru.dmitriyt.vkarchiver.data.resources.Logger
 
 private const val DEFAULT_LIMIT = 50
 
@@ -23,6 +24,7 @@ class GetWallPostsUseCase(
                 limit = DEFAULT_LIMIT,
             )
         } catch (e: Exception) {
+            Logger.e(e)
             emit(Result.Error(e))
             return@flow
         }
@@ -30,6 +32,9 @@ class GetWallPostsUseCase(
         val total = firstPartResponse.count
         val allPosts = mutableListOf<WallpostFull>()
         allPosts.addAll(firstPartResponse.items)
+
+        emit(Result.Data(allPosts))
+        return@flow
 
         emit(Result.Progress(allPosts.size.toFloat() / total))
 
@@ -42,6 +47,7 @@ class GetWallPostsUseCase(
                     limit = DEFAULT_LIMIT,
                 )
             } catch (e: Exception) {
+                Logger.e(e)
                 emit(Result.Error(e))
                 return@flow
             }

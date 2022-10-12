@@ -26,6 +26,7 @@ abstract class BaseViewModel {
         try {
             emit(LoadingState.Success(block()))
         } catch (e: Exception) {
+            Logger.e(e)
             emit(LoadingState.Error(e))
         }
     }

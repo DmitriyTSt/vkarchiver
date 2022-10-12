@@ -2,16 +2,17 @@ package ru.dmitriyt.vkarchiver.data.resources
 
 import com.vk.api.sdk.objects.wall.WallpostAttachment
 import com.vk.api.sdk.objects.wall.WallpostAttachmentType
-import com.vk.api.sdk.objects.wall.WallpostFull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import ru.dmitriyt.vkarchiver.data.model.PostAttachment
+import ru.dmitriyt.vkarchiver.data.model.PostWithAttachments
 import java.text.SimpleDateFormat
 
 /**
  * HTML шаблон ленты сообщества
  */
 object WallPostTemplates {
-    suspend fun getHtmlPosts(domain: String, posts: List<WallpostFull>): String = withContext(Dispatchers.Default) {
+    suspend fun getHtmlPosts(domain: String, posts: List<PostWithAttachments>): String = withContext(Dispatchers.Default) {
         """
         <html>
             <head>
@@ -32,7 +33,8 @@ object WallPostTemplates {
     """.trimIndent()
     }
 
-    private fun getPostHtml(post: WallpostFull): String {
+    private fun getPostHtml(postWithAttachments: PostWithAttachments): String {
+        val post = postWithAttachments.post
         val formatter = SimpleDateFormat("dd.MM.yyyy HH:mm")
         val dateString = formatter.format((post.date ?: 0) * 1000L)
         return """
@@ -40,10 +42,20 @@ object WallPostTemplates {
             <div class="post-author">Автор: ${post.fromId ?: 0}</div>
             <div class="post-date">$dateString</div>
             <div class="post-text">${post.text?.let(::formatText) ?: ""}</div>
-            <div class="post-attachments">
+            <hr>
+            <div class="post-attachments-original">
+            <div class="post-attachment-title">Внешние ресурсы</div>
                 ${post.attachments.orEmpty().joinToString("\n") { getAttachmentHtml(it) }}
             </div>
+            <hr>
+            <div class="post-attachments-cached">
+                <div class="post-attachment-title">Сохраненные ресурсы</div>
+                ${postWithAttachments.attachments.joinToString("\n") { getCachedAttachmentHtml(it) }}
+            </div>
         </div>
+        <hr/>
+        <br>
+        <br>
         <hr/>
     """.trimIndent()
     }
@@ -76,12 +88,16 @@ object WallPostTemplates {
             .replace("\n", "<br>")
     }
 
+    private fun getCachedAttachmentHtml(cachedAttachment: PostAttachment): String {
+        return when (cachedAttachment) {
+            is PostAttachment.Image -> """
+                <img width=400 src="${cachedAttachment.filePath}"/>
+            """.trimIndent()
+        }
+    }
+
     private fun getAttachmentHtml(attachment: WallpostAttachment): String {
         return when (attachment.type) {
-            WallpostAttachmentType.PHOTO -> """<div class="attachment-photo">
-                <img width=300 src="${attachment.photo.sizes.maxByOrNull { it.width }?.url}"/>
-                ${attachment.photo.images.orEmpty().joinToString("\n") { """<a href="${it.url}">${it.url}</a>""" }}
-            </div>""".trimIndent()
             WallpostAttachmentType.VIDEO -> """<div class="attachment-video">
                 <img width=300 src="${attachment.video.firstFrame?.maxByOrNull { it.width }?.url}"/>
                 ${attachment.video.ownerId}_${attachment.video.id}

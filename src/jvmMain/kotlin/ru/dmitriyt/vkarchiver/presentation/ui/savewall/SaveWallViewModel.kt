@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import ru.dmitriyt.vkarchiver.data.model.LoadingState
+import ru.dmitriyt.vkarchiver.data.resources.Logger
 import ru.dmitriyt.vkarchiver.data.resources.StringRes
 import ru.dmitriyt.vkarchiver.domain.GetWallPostsUseCase
 import ru.dmitriyt.vkarchiver.domain.SaveWallPostsUseCase
@@ -40,6 +41,7 @@ class SaveWallViewModel(
     }
 
     private fun saveWallPosts(directoryPath: String, domain: String, items: List<WallpostFull>) {
+        Logger.d("start save wall posts")
         executeFlow { saveWallPostsUseCase(directoryPath, domain, items) }.collectTo(_saveWallState) { state ->
             when (state) {
                 is LoadingState.Error -> SaveWallState.Error(state.message)
