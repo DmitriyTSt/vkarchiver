@@ -26,7 +26,7 @@ class SaveImageResourceToCacheUseCase(
             }
         }
         val filePath = try {
-            repository.saveResourceToCache(resourceId, url, imageCachePath, ".jpg")
+            repository.saveResourceToCache(resourceId, url, imageCachePath, "jpg")
         } catch (e: Exception) {
             Logger.e(e)
             return null
