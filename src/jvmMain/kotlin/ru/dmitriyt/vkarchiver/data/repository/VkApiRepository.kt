@@ -14,16 +14,16 @@ interface VkApiRepository {
     suspend fun loadWallPosts(userActor: UserActor, domain: String, offset: Int, limit: Int): GetResponse
 }
 
-fun VkApiRepository(): VkApiRepository = VkApiRepositoryImpl(AppEnvRepository())
+fun VkApiRepository(): VkApiRepository = VkApiRepositoryImpl(VkApiClient(HttpTransportClient.getInstance()), AppEnvRepository())
 
 private class VkApiRepositoryImpl(
+    private val vkApiService: VkApiClient,
     private val appEnvRepository: AppEnvRepository,
 ) : VkApiRepository {
-    private val vk = VkApiClient(HttpTransportClient.getInstance())
 
     override suspend fun authByCode(code: String): AuthResult = withContext(Dispatchers.IO) {
         val appEnv = appEnvRepository.getEnv()
-        val userAuthResponse = vk.oAuth()
+        val userAuthResponse = vkApiService.oAuth()
             .userAuthorizationCodeFlow(appEnv.appId, appEnv.clientSecret, appEnv.redirectUri, code)
             .execute()
 
@@ -39,7 +39,7 @@ private class VkApiRepositoryImpl(
         offset: Int,
         limit: Int,
     ): GetResponse = withContext(Dispatchers.IO) {
-        vk.wall().get(userActor)
+        vkApiService.wall().get(userActor)
             .domain(domain)
             .offset(offset)
             .count(limit)
