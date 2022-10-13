@@ -1,6 +1,6 @@
 package ru.dmitriyt.vkarchiver.domain
 
-import com.vk.api.sdk.client.actors.UserActor
+import ru.dmitriyt.vkarchiver.data.model.UserActor
 import ru.dmitriyt.vkarchiver.data.repository.SettingsRepository
 import ru.dmitriyt.vkarchiver.data.repository.VkApiRepository
 

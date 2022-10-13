@@ -1,6 +1,5 @@
 import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("multiplatform")
@@ -27,9 +26,15 @@ kotlin {
     sourceSets {
         val jvmMain by getting {
             dependencies {
+                val ktorVersion = "2.1.2"
                 implementation(compose.desktop.currentOs)
-                implementation("com.vk.api:sdk:1.0.14")
+                implementation("com.google.code.gson:gson:2.9.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
+                implementation("io.ktor:ktor-client-core:$ktorVersion")
+                implementation("io.ktor:ktor-client-cio:$ktorVersion")
+                implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+                implementation("io.ktor:ktor-client-logging:$ktorVersion")
             }
         }
         val jvmTest by getting
