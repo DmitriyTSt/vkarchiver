@@ -7,6 +7,7 @@ import ru.dmitriyt.vkarchiver.data.model.WallPost
 import ru.dmitriyt.vkarchiver.data.repository.SettingsRepository
 import ru.dmitriyt.vkarchiver.data.repository.VkApiRepository
 import ru.dmitriyt.vkarchiver.data.resources.Logger
+import kotlin.math.min
 
 private const val DEFAULT_LIMIT = 50
 
@@ -14,14 +15,15 @@ class GetWallPostsUseCase(
     private val settingsRepository: SettingsRepository,
     private val vkApiRepository: VkApiRepository,
 ) {
-    suspend operator fun invoke(domain: String): Flow<Result> = flow {
+    suspend operator fun invoke(domain: String, postsCount: Int?): Flow<Result> = flow {
+        val allLimit = postsCount?.takeIf { it > 0 }
         val actor = settingsRepository.getSettings().let { UserActor(it.userId, it.accessToken) }
         val firstPartResponse = try {
             vkApiRepository.loadWallPosts(
                 userActor = actor,
                 domain = domain,
                 offset = 0,
-                limit = DEFAULT_LIMIT,
+                limit = min(DEFAULT_LIMIT, allLimit ?: DEFAULT_LIMIT),
             )
         } catch (e: Exception) {
             Logger.e(e)
@@ -29,12 +31,9 @@ class GetWallPostsUseCase(
             return@flow
         }
 
-        val total = firstPartResponse.count
+        val total = allLimit?.coerceAtMost(firstPartResponse.count) ?: firstPartResponse.count
         val allPosts = mutableListOf<WallPost>()
         allPosts.addAll(firstPartResponse.items)
-
-        emit(Result.Data(allPosts))
-        return@flow
 
         emit(Result.Progress(allPosts.size.toFloat() / total))
 

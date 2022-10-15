@@ -29,6 +29,7 @@ class WallPostMapper {
             ApiWallPostAttachmentType.DOC -> fromApiToModel(api.doc)
             ApiWallPostAttachmentType.LINK -> fromApiToModel(api.link)
             ApiWallPostAttachmentType.PHOTOS_LIST -> fromApiPhotoListToModel(api.photosList)
+            ApiWallPostAttachmentType.UNKNOWN -> null
             null -> null
         }
     }

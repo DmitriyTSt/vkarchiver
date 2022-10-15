@@ -1,6 +1,6 @@
 package ru.dmitriyt.vkarchiver.data.model
 
-class WallPost(
+data class WallPost(
     val id: Int,
     val fromId: Int,
     val date: Long,
