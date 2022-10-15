@@ -1,7 +1,9 @@
 package ru.dmitriyt.vkarchiver.presentation.ui.savewall
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import ru.dmitriyt.vkarchiver.data.model.LoadingState
 import ru.dmitriyt.vkarchiver.data.model.WallPost
@@ -25,27 +27,36 @@ class SaveWallViewModel(
             return@launch
         }
         val domain = groupAddress.replace("https://vk.com/", "")
-        _saveWallState.value = SaveWallState.Loading(0f)
+        _saveWallState.value = SaveWallState.Loading("Загрузка", 0f)
         getWallPostsUseCase(domain).collect { result ->
             val state = when (result) {
                 is GetWallPostsUseCase.Result.Data -> {
                     saveWallPosts(directoryPath, domain, result.items)
-                    SaveWallState.Loading(1f)
+                    SaveWallState.Loading("Загрузка", 1f)
                 }
                 is GetWallPostsUseCase.Result.Error -> SaveWallState.Error(result.t.message ?: StringRes.defaultErrorMessage)
-                is GetWallPostsUseCase.Result.Progress -> SaveWallState.Loading(result.progress)
+                is GetWallPostsUseCase.Result.Progress -> SaveWallState.Loading("Загрузка", result.progress)
             }
             _saveWallState.value = state
         }
     }
 
-    private fun saveWallPosts(directoryPath: String, domain: String, items: List<WallPost>) {
+    private fun saveWallPosts(directoryPath: String, domain: String, items: List<WallPost>) = viewModelScope.launch {
         Logger.d("start save wall posts")
-        executeFlow { saveWallPostsUseCase(directoryPath, domain, items) }.collectTo(_saveWallState) { state ->
-            when (state) {
-                is LoadingState.Error -> SaveWallState.Error(state.message)
-                is LoadingState.Loading -> SaveWallState.Loading(1f)
-                is LoadingState.Success -> SaveWallState.Success(domain, LocalDateTime.now())
+        executeFlow { saveWallPostsUseCase(directoryPath, domain, items) }.collect { loadableState ->
+            when (loadableState) {
+                is LoadingState.Error -> _saveWallState.value = SaveWallState.Error(loadableState.message)
+                is LoadingState.Loading -> _saveWallState.value = SaveWallState.Loading("Кеширование", 0f)
+                is LoadingState.Success -> loadableState.data.collect { result ->
+                    val state = when (result) {
+                        is SaveWallPostsUseCase.Result.Error -> SaveWallState.Error(
+                            result.t.message ?: StringRes.defaultErrorMessage
+                        )
+                        is SaveWallPostsUseCase.Result.Progress -> SaveWallState.Loading("Кеширование", result.progress)
+                        is SaveWallPostsUseCase.Result.Data -> SaveWallState.Success(domain, LocalDateTime.now())
+                    }
+                    _saveWallState.value = state
+                }
             }
         }
     }

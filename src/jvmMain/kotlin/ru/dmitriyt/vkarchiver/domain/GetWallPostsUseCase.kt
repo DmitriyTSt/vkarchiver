@@ -33,6 +33,9 @@ class GetWallPostsUseCase(
         val allPosts = mutableListOf<WallPost>()
         allPosts.addAll(firstPartResponse.items)
 
+        emit(Result.Data(allPosts))
+        return@flow
+
         emit(Result.Progress(allPosts.size.toFloat() / total))
 
         repeat(total / DEFAULT_LIMIT) {

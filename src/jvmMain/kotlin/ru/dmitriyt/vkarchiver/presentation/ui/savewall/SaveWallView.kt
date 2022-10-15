@@ -51,6 +51,10 @@ fun SaveWallView(modifier: Modifier = Modifier, directoryPath: String?, viewMode
                 }
             } else {
                 Column(modifier = Modifier.widthIn(100.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        modifier = Modifier.padding(top = 4.dp),
+                        text = (state as SaveWallState.Loading).message,
+                    )
                     CircularProgressIndicator()
                     Text(
                         modifier = Modifier.padding(top = 4.dp),
