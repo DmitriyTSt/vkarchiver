@@ -8,7 +8,7 @@ import ru.dmitriyt.vkarchiver.data.repository.SettingsRepository
 import ru.dmitriyt.vkarchiver.data.repository.VkApiRepository
 import ru.dmitriyt.vkarchiver.data.resources.Logger
 
-private const val DEFAULT_LIMIT = 10
+private const val DEFAULT_LIMIT = 50
 
 class GetWallPostsUseCase(
     private val settingsRepository: SettingsRepository,
@@ -32,9 +32,6 @@ class GetWallPostsUseCase(
         val total = firstPartResponse.count
         val allPosts = mutableListOf<WallPost>()
         allPosts.addAll(firstPartResponse.items)
-
-        emit(Result.Data(allPosts))
-        return@flow
 
         emit(Result.Progress(allPosts.size.toFloat() / total))
 

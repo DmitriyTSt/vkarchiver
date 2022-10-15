@@ -67,11 +67,15 @@ private class OAuthImpl : VkApiService.OAuth {
                 }
             )
         }
+        install(Logging) {
+            logger = Logger.SIMPLE
+            level = LogLevel.BODY
+        }
         defaultRequest {
             url {
                 protocol = URLProtocol.HTTPS
                 host = OAUTH_DOMAIN
-                parametersOf("v", API_VERSION)
+                parameters.append("v", API_VERSION)
             }
         }
     }
