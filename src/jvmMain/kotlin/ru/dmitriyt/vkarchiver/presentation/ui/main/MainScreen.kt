@@ -27,10 +27,10 @@ fun MainScreen(viewModel: MainViewModel = viewModels()) {
         viewModel.loadDirectory()
     }
 
-    Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp)) {
+    Column {
         when (directoryState) {
             DirectoryState.Loading -> Box(contentAlignment = Alignment.Center) { CircularProgressIndicator() }
-            is DirectoryState.Data -> Row {
+            is DirectoryState.Data -> Row(modifier = Modifier.padding(start = 16.dp, end = 16.dp)) {
                 val directory = (directoryState as DirectoryState.Data).directoryPath
                 Text(
                     text = (directory ?: StringRes.selectDirectoryLabel),

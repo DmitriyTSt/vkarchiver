@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 
 sealed class SaveWallState {
     object Idle : SaveWallState()
-    data class Loading(val progress: Float) : SaveWallState()
+    data class Loading(val message: String, val progress: Float) : SaveWallState()
     data class Error(val message: String) : SaveWallState()
     data class Success(val domain: String, val time: LocalDateTime) : SaveWallState()
 }

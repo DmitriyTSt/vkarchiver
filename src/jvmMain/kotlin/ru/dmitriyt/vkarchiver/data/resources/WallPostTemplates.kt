@@ -26,6 +26,9 @@ object WallPostTemplates {
 					.post-text {
 						margin-top: 16px;
 					}
+                    .post-attachments-original img {
+                        width: 320px;
+                    }
                     .post-attachments-cached img {
                         width: 320px;
                     }
@@ -127,7 +130,7 @@ object WallPostTemplates {
     }
 
     private fun getAttachmentBlockHtml(post: WallPost): String {
-        if (post.attachments.none { it !is WallPostAttachment.Photo }) return ""
+        if (post.attachments.isEmpty()) return ""
         return """
             <hr>
             <div class="post-attachments-original">
@@ -139,6 +142,9 @@ object WallPostTemplates {
 
     private fun getAttachmentHtml(attachment: WallPostAttachment): String {
         return when (attachment) {
+            is WallPostAttachment.Photo -> """
+                <img src="${attachment.url}"/>
+            """.trimIndent()
             is WallPostAttachment.Video -> """<div class="attachment-video">
                 <a href="https://vk.com/video${attachment.ownerId}_${attachment.id}">
                     https://vk.com/video${attachment.ownerId}_${attachment.id}

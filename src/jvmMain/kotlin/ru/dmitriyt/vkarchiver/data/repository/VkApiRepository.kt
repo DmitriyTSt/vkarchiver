@@ -9,6 +9,7 @@ import ru.dmitriyt.vkarchiver.data.model.AuthResult
 import ru.dmitriyt.vkarchiver.data.model.ListData
 import ru.dmitriyt.vkarchiver.data.model.UserActor
 import ru.dmitriyt.vkarchiver.data.model.WallPost
+import ru.dmitriyt.vkarchiver.data.resources.StringRes
 import ru.dmitriyt.vkarchiver.data.source.VkApiService
 
 interface VkApiRepository {
@@ -43,7 +44,9 @@ private class VkApiRepositoryImpl(
     ): ListData<WallPost> = withContext(Dispatchers.IO) {
         val response = vkApiService.api()
             .wallPosts(userActor.accessToken.orThrow("access token is null"), domain, offset, limit)
-            .response
+            .let { baseResponse ->
+                baseResponse.response.orThrow(baseResponse.error?.errorMessage ?: StringRes.defaultErrorMessage)
+            }
         val data = ListData(response.count.orDefault(), response.items.orEmpty().map { mapper.fromApiToModel(it) })
         return@withContext data
     }

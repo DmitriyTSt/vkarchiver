@@ -16,26 +16,22 @@ class SaveImageResourceToCacheUseCase(
 ) {
 
     suspend operator fun invoke(
-        postFromId: Int,
-        postId: Int,
-        index: Int,
+        uniqueId: String,
         photo: WallPostAttachment.Photo,
-    ): CachedWallPostAttachment.Image? {
-        val resourceId = "image${postFromId}_${postId}_$index"
+    ): CachedWallPostAttachment.Image? = withContext(Dispatchers.IO) {
+        val resourceId = "image$uniqueId"
         val imageCachePath = "${getCacheDirectoryUseCase()}${File.separator}$CACHE_DIRECTORY_NAME"
         val imageCacheDir = File(imageCachePath)
-        withContext(Dispatchers.IO) {
-            if (!imageCacheDir.exists()) {
-                imageCacheDir.mkdir()
-            }
+        if (!imageCacheDir.exists()) {
+            imageCacheDir.mkdir()
         }
         val filePath = try {
             repository.saveResourceToCache(resourceId, photo.url, imageCachePath, "jpg")
         } catch (e: Exception) {
             Logger.e(e)
-            return null
+            return@withContext null
         }
-        return CachedWallPostAttachment.Image(filePath)
+        CachedWallPostAttachment.Image(filePath)
     }
 
     companion object {
